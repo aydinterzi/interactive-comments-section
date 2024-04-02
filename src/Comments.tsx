@@ -27,10 +27,35 @@ export type User = {
 function Comments({
   comments,
   currentUser,
+  setComments,
 }: {
   comments: CommentType[];
   currentUser: User;
+  setComments: (comments: CommentType[]) => void;
 }) {
+  const handleReply = (reply: string, comment) => {
+    const newComment: CommentType = {
+      id: comments.length + 1,
+      content: reply,
+      createdAt: new Date().toISOString(),
+      score: 0,
+      user: currentUser,
+      replyingTo: comment.user.username,
+      replies: [],
+    };
+    setComments((prev) => {
+      const newComments = [...prev];
+      const index = newComments.findIndex((c) => c.id === comment.id);
+      newComments[index].replies = [...newComments[index].replies, newComment];
+      return newComments;
+    });
+  };
+
+  const handleDelete = (comment) => {
+    setComments((prev) => {
+      return prev.filter((c) => c.id !== comment.id);
+    });
+  };
   return (
     <div className="flex flex-col gap-4 w-[600px]">
       {comments
@@ -38,7 +63,13 @@ function Comments({
         .map((comment) => {
           return (
             <div key={comment.id}>
-              <Comment comment={comment} currentUser={currentUser} />
+              <Comment
+                comment={comment}
+                currentUser={currentUser}
+                setComments={setComments}
+                handleReply={handleReply}
+                handleDelete={handleDelete}
+              />
             </div>
           );
         })}

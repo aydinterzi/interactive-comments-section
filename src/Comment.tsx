@@ -10,12 +10,17 @@ function Comment({
   comment,
   currentUser,
   reply,
+  handleReply,
+  handleDelete,
 }: {
   comment: CommentType;
   currentUser: User;
   reply?: boolean;
+  handleReply: (reply: string, comment: CommentType) => void;
+  handleDelete: (comment: CommentType) => void;
 }) {
   const [showReply, setShowReply] = useState(false);
+
   return (
     <>
       <div className="bg-white flex flex-row p-4 gap-4 rounded-md text-base text-grayish-blue mb-4">
@@ -53,7 +58,10 @@ function Comment({
             )}
             {currentUser.username === comment.user.username && (
               <div className="flex items-center gap-4 font-bold">
-                <div className="flex items-center gap-2">
+                <div
+                  className="flex items-center gap-2"
+                  onClick={() => handleDelete(comment)}
+                >
                   <img src={deleteIcon} alt="edit" className="h-4 w-4" />
                   <p className="text-soft-red">Delete</p>
                 </div>
@@ -77,12 +85,25 @@ function Comment({
           comment.replies.map((reply) => {
             return (
               <div key={reply.id}>
-                <Comment comment={reply} currentUser={currentUser} reply />
+                <Comment
+                  comment={reply}
+                  currentUser={currentUser}
+                  handleReply={handleReply}
+                  handleDelete={handleDelete}
+                  reply
+                />
               </div>
             );
           })}
       </div>
-      {showReply && <Reply currentUser={currentUser} />}
+      {showReply && (
+        <Reply
+          currentUser={currentUser}
+          handleReply={handleReply}
+          setShowReply={setShowReply}
+          comment={comment}
+        />
+      )}
     </>
   );
 }
